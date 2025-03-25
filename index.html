@@ -283,14 +283,14 @@
 
             let userMessageContainer = document.createElement("div");
             userMessageContainer.className = "message-container user-message-container";
-            
+
             let userContentWrapper = document.createElement("div");
             userContentWrapper.className = "message-content-wrapper";
-            
+
             let userDiv = document.createElement("div");
             userDiv.className = "user-message";
             userDiv.textContent = userMessage;
-            
+
             userContentWrapper.appendChild(userDiv);
             userMessageContainer.appendChild(userContentWrapper);
             chatBox.appendChild(userMessageContainer);
@@ -300,17 +300,17 @@
 
             let botMessageContainer = document.createElement("div");
             botMessageContainer.className = "message-container";
-    
+
             let botAvatar = document.createElement("div");
             botAvatar.className = "avatar bot-avatar";
             let avatarText = document.createElement("span");
             avatarText.className = "avatar-text";
             avatarText.textContent = "AI";
             botAvatar.appendChild(avatarText);
-            
+
             let botContentWrapper = document.createElement("div");
             botContentWrapper.className = "message-content-wrapper";
-            
+
             let botDiv = document.createElement("div");
             botDiv.className = "bot-message";
 
@@ -318,31 +318,34 @@
             loader.className = "loader";
             botDiv.appendChild(loader);
             botDiv.appendChild(document.createTextNode("Generating response..."));
-            
+
             botContentWrapper.appendChild(botDiv);
             botMessageContainer.appendChild(botAvatar);
             botMessageContainer.appendChild(botContentWrapper);
             chatBox.appendChild(botMessageContainer);
 
             try {
-                let apiUrl = "https://e101-34-142-213-181.ngrok-free.app/generate";  // Your ngrok URL here
+                let apiUrl = "https://5fc9-34-142-213-181.ngrok-free.app/gemini";  // Replace with your ngrok URL
                 let response = await fetch(apiUrl, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ prompt: userMessage })
+                    body: JSON.stringify({ query: userMessage }) 
                 });
 
                 let data = await response.json();
 
                 botDiv.innerHTML = '';  
-                
-                let formattedResponse = formatResponse(data.response);
-                botDiv.innerHTML = formattedResponse;
-                
-                document.querySelectorAll('pre code').forEach((block) => {
-                    hljs.highlightBlock(block);
-                });
 
+                if (data.response) {
+                    let formattedResponse = formatResponse(data.response);
+                    botDiv.innerHTML = formattedResponse;
+
+                    document.querySelectorAll('pre code').forEach((block) => {
+                        hljs.highlightBlock(block);
+                    });
+                } else {
+                    botDiv.innerHTML = "No response received from the server.";
+                }
             } catch (error) {
                 console.error("Error:", error);
                 botDiv.innerHTML = "Error generating response. Please try again.";
@@ -350,6 +353,7 @@
 
             chatBox.scrollTop = chatBox.scrollHeight;
         }
+
 
         function formatResponse(text) {
            
